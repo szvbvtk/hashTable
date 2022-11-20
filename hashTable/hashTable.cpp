@@ -124,6 +124,10 @@ struct LinkedList {
 
         while (n != nullptr) {
             s += n->data.key + " -> " + func(n->data.data) + "; \n";
+
+            if(n->next != nullptr)
+                s += "\t\t   ";
+
             n = n->next;
         }
 
@@ -133,6 +137,16 @@ struct LinkedList {
 
     int getSize() {
         return size;
+    }
+
+    Node<T>* get(int i) {
+        Node<T>* n = head;
+
+        for (int j = 0; j < i; j++) {
+            n = n->next;
+        }
+
+        return n;
     }
 };
 
@@ -163,14 +177,13 @@ struct HashTable {
 
     int hash_func(string key) {
         int q = key.length();
-        int hash = 0;
+        long long hash = 0;
 
         for (int i = 0; i < q; i++) {
             hash += key[i] * pow(31, (q - 1 - i));
         }
 
         hash = abs(hash % capacity);
-
         return hash;
     }
 
@@ -181,13 +194,13 @@ struct HashTable {
         LinkedList<Item<T>, T>* tmp_array = new LinkedList<Item<T>, T>[capacity];
 
         for (int i = 0; i < old_capacity; i++) {
-            if (array[i].head != nullptr) {
-                Node<Item<T>>* n = array[i].head;
-                string key = n->data.key;
-
-                int hash = hash_func(key);
-
-                tmp_array[hash] = array[i];
+            if (!array[i].isEmpty()) {
+                for (int j = 0; j < array[i].getSize(); j++) {
+                    Node<Item<T>>* n = array[i].get(j);
+                    string key = n->data.key;
+                    int hash = hash_func(key);
+                    tmp_array[hash].pushBack(n->data);
+                }
             }
         }
         delete array;
@@ -271,17 +284,15 @@ struct HashTable {
     }
 
     string str() {
-        string s = "Hash table: \n\tCurrent size: " + to_string(capacity) + "\n\tMax size: " + to_string(INT_MAX) + "\n\tTable:\n\t{\n";
+        string s = "Hash table: \n\tCurrent size: " + to_string(size) + "\n\tMax size: " + to_string(capacity) + "\n\tTable:\n\t{\n";
 
         for (int i = 0; i < capacity; i++) {
             if (!array[i].isEmpty()) {
-                s += "\t\t" + to_string(i) + ": " + array[i].str(so_str);
-
-
+                s +=  "\t\t" + to_string(i) + ": " + array[i].str(so_str);
             }
         }
 
-        s += "\t}\nStats:\n" + stats();
+        s += "\t}\n\nStats:\n" + stats();
 
         return s;
     }
@@ -300,7 +311,20 @@ int main()
     simple_object o2{ "Marcin", 33 };
     ht->insert("pies", o1);
     ht->insert("kotek", o2);
-
+    ht->insert("jan", { "jhkhjk", 25 });
+    ht->insert("jany", { "karmnik", 35 });
+    ht->insert("panar", { "kjlkjl", 35 });
+    ht->insert("monar", { "kjlkkkjl", 1115 });
+    ht->insert("money", { "kjl898789kjl", 11175 });
+    ht->insert("zut", { "inf", 1 });
+    ht->insert("korzen", { "inf", 1 });
+    ht->insert("rzymianin", { "inf", 1 });
+    ht->insert("mlodyafryk", { "inf", 1 });
+    ht->insert("nierob", { "inf", 1 });
+    ht->insert("puszka", { "inf", 1 });
+    ht->insert("mucha", { "inf", 1 });
+    ht->insert("duch", { "inf", 1 });
+    ht->insert("mlot", { "infkjkj", -199 });
     //ht->clear();
     //cout << ht->remove("pies");
     //Item<simple_object>* it = ht->search("pies");
