@@ -189,7 +189,7 @@ struct HashTable {
 
     void rehash() {
         int old_capacity = capacity;
-        capacity += 10;
+        capacity *= 2;
 
         LinkedList<Item<T>, T>* tmp_array = new LinkedList<Item<T>, T>[capacity];
 
@@ -280,7 +280,7 @@ struct HashTable {
         }
 
         float average_list_size = item_counter / static_cast<float>(capacity);
-        return "Stats:\n\tlist min size: " + to_string(min_list_size) + "\n\tlist max size: " + to_string(max_list_size) + "\n\tnonempty lists: " + to_string(nonempty_lists) + "\n\taverage list size: " + to_string(average_list_size);
+        return "Stats:\n\tlist min size: " + to_string(min_list_size) + "\n\tlist max size: " + to_string(max_list_size) + "\n\tnonempty lists: " + to_string(nonempty_lists) + "\n\taverage list size: " + to_string(average_list_size) + '\n';
     }
 
     string str(string(*func)(T), int x = 0) {
@@ -347,7 +347,7 @@ int main()
     //delete ht;
 
 
-    const int MAX_ORDER = 3;
+    const int MAX_ORDER = 7;
     HashTable<int>* ht = new HashTable<int>();
 
     for (int o = 1; o <= MAX_ORDER; o++) {
