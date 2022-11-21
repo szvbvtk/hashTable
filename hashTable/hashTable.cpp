@@ -254,7 +254,7 @@ struct HashTable {
         delete[] array;
         size = 0;
         capacity = 10;
-        array = new LinkedList<Item<T>>[capacity];
+        array = new LinkedList<Item<T>, T>[capacity];
     }
 
     string stats() {
@@ -280,19 +280,22 @@ struct HashTable {
         }
 
         float average_list_size = item_counter / static_cast<float>(capacity);
-        return "\tlist min size: " + to_string(min_list_size) + "\n\tlist max size: " + to_string(max_list_size) + "\n\tnonempty lists: " + to_string(nonempty_lists) + "\n\taverage list size: " + to_string(average_list_size);
+        return "Stats:\n\tlist min size: " + to_string(min_list_size) + "\n\tlist max size: " + to_string(max_list_size) + "\n\tnonempty lists: " + to_string(nonempty_lists) + "\n\taverage list size: " + to_string(average_list_size);
     }
 
-    string str() {
+    string str(string(*func)(T), int x = 0) {
         string s = "Hash table: \n\tCurrent size: " + to_string(size) + "\n\tMax size: " + to_string(capacity) + "\n\tTable:\n\t{\n";
 
-        for (int i = 0; i < capacity; i++) {
+        if (x < 1)
+            x = capacity;
+
+        for (int i = 0; i < x; i++) {
             if (!array[i].isEmpty()) {
-                s +=  "\t\t" + to_string(i) + ": " + array[i].str(so_str);
+                s +=  "\t\t" + to_string(i) + ": " + array[i].str(func);
             }
         }
 
-        s += "\t}\n\nStats:\n" + stats();
+        s += "\t}\n";
 
         return s;
     }
@@ -301,37 +304,76 @@ struct HashTable {
 
 
 
+string randKey(int j) {
+    string s = "";
+    for (int i = 0; i < j; i++)
+        s += static_cast<char>(rand() % (127 + 1 - 32) + 32);
 
+    return s;
+}
 
 
 int main()
 {
-    HashTable<simple_object>* ht = new HashTable<simple_object>();
-    simple_object o1{ "Szabat", 21 };
-    simple_object o2{ "Marcin", 33 };
-    ht->insert("pies", o1);
-    ht->insert("kotek", o2);
-    ht->insert("jan", { "jhkhjk", 25 });
-    ht->insert("jany", { "karmnik", 35 });
-    ht->insert("panar", { "kjlkjl", 35 });
-    ht->insert("monar", { "kjlkkkjl", 1115 });
-    ht->insert("money", { "kjl898789kjl", 11175 });
-    ht->insert("zut", { "inf", 1 });
-    ht->insert("korzen", { "inf", 1 });
-    ht->insert("rzymianin", { "inf", 1 });
-    ht->insert("mlodyafryk", { "inf", 1 });
-    ht->insert("nierob", { "inf", 1 });
-    ht->insert("puszka", { "inf", 1 });
-    ht->insert("mucha", { "inf", 1 });
-    ht->insert("duch", { "inf", 1 });
-    ht->insert("mlot", { "infkjkj", -199 });
+    srand(time(NULL));
+
+    //HashTable<simple_object>* ht = new HashTable<simple_object>();
+    //simple_object o1{ "Szabat", 21 };
+    //simple_object o2{ "Marcin", 33 };
+    //ht->insert("pies", o1);
+    //ht->insert("kotek", o2);
+    //ht->insert("jan", { "jhkhjk", 25 });
+    //ht->insert("jany", { "karmnik", 35 });
+    //ht->insert("panar", { "kjlkjl", 35 });
+    //ht->insert("monar", { "kjlkkkjl", 1115 });
+    //ht->insert("money", { "kjl898789kjl", 11175 });
+    //ht->insert("zut", { "inf", 1 });
+    //ht->insert("korzen", { "inf", 1 });
+    //ht->insert("rzymianin", { "inf", 1 });
+    //ht->insert("mlodyafryk", { "inf", 1 });
+    //ht->insert("nierob", { "inf", 1 });
+    //ht->insert("puszka", { "inf", 1 });
+    //ht->insert("mucha", { "inf", 1 });
+    //ht->insert("duch", { "inf", 1 });
+    //ht->insert("mlot", { "infkjkj", -199 });
     //ht->clear();
     //cout << ht->remove("pies");
     //Item<simple_object>* it = ht->search("pies");
     //if (it == nullptr) cout << "NULLPTR";
     //cout << so_str(it->data);
 
-    cout << ht->str();
+    //cout << ht->str(so_str);
+    //ht->clear();
+    //delete ht;
+
+
+    const int MAX_ORDER = 3;
+    HashTable<int>* ht = new HashTable<int>();
+
+    for (int o = 1; o <= MAX_ORDER; o++) {
+        const int n = pow(10, o);
+
+        clock_t t1 = clock();
+        for (int i = 0; i < n; i++)
+            ht->insert(randKey(6), i);
+        clock_t t2 = clock();
+
+        cout << ht->str(to_string, 5);
+        cout << "\nCzas dodawania: " << (double)(t2 - t1) / CLOCKS_PER_SEC;
+
+        const int m = pow(10, 4);
+        int hits = 0;
+        t1 = clock();
+        for (int i = 0; i < m; i++) {
+            Item<int>* it = ht->search(randKey(6));
+            if (it != nullptr)
+                hits++;
+        }
+        t2 = clock();
+        cout << "\nCzas wyszukiwania: " << (double)(t2 - t1) / CLOCKS_PER_SEC << "\n";
+        cout << ht->stats();
+        ht->clear();
+    }
     delete ht;
 }
 
